@@ -334,11 +334,35 @@ class _NodeSpec(_ValueEncoding):
     },
     examples=[9606, 10090, 69293]
   )
+  prioritize: Optional[frozenset[_BiolinkCategories]] = Field(
+    default=None,
+    description="a set of biolink categories to prioritize mapping values to",
+    examples=[
+      ["GENE", "PATHWAY"],
+      ["PROTEIN"],
+      ["ORGANISM_TAXON", "DISEASE", "PHENOTYPIC_FEATURE"]
+    ]
+  )
+  avoid: Optional[frozenset[_BiolinkCategories]] = Field(
+    default=None,
+    description="a set of biolink categories to avoid mapping values to",
+    examples=[
+      ["GENE", "DISEASE"],
+      ["PUBLICATION"],
+      ["ORGANISM_TAXON", "PATHWAY", "PHENOTYPIC_FEATURE"]
+    ]
+  )
+  prefix: Optional[str] = Field(
+    default=None,
+    description="a prefix to add to the begining of all values before mapping",
+    examples=["ENSEMBL:", "Clostridia ", "UMLS:"]
+  )
+  suffix: Optional[str] = Field(
+    default=None,
+    description="a suffix to add to the end of all values before mapping",
+    examples=[" sp.", "Syndrome", "Disease"]
+  )
   # TODO: START DOCUMENTATION HERE
-  prioritize: Optional[frozenset[_BiolinkCategories]] = Field(default=None)
-  avoid: Optional[frozenset[_BiolinkCategories]] = Field(default=None)
-  prefix: Optional[str] = Field(default=None)
-  suffix: Optional[str] = Field(default=None)
   fill: Optional[_FillMethods] = Field(default=None)
   remove: Optional[list[str]] = Field(default=None)
   regex: Optional[list[_RegexRules]] = Field(default=None)
