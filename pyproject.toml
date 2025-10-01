@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "TableConfig"
+version = "3.0.0"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+SERVE_TABLE_CONFIG_API = "TableConfig.serve:api"
