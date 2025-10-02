@@ -59,7 +59,7 @@
               spec:
                 containers:
                   - name: ${AppName}-container
-                    image: ${OCIContainer.pname}:${version}
+                    image: ${OCIContainer.name}:${version}
                 ports:
                   - containerPort: ${port}
             ---
