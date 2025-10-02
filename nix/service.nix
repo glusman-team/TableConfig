@@ -34,7 +34,7 @@
       OCIContainer = pkgs.ociTools.buildImage {
         pname = AppName;
         tag = version;
-        contents = [TableConfigAPI];
+        contents = [TableConfigAPIS];
         config = {
           ExposedPorts = {"${port}/tcp" = {};};
           Entrypoint = ["SERVE_TABLE_CONFIG_APIS"];
