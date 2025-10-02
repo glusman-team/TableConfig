@@ -10,4 +10,4 @@ version = "3.0.0"
 where = ["src"]
 
 [project.scripts]
-SERVE_TABLE_CONFIG_API = "TableConfig.serve:api"
+SERVE_TABLE_CONFIG_APIS = "TableConfig.serve:apis"
