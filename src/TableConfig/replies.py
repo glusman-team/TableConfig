@@ -765,7 +765,7 @@ class _MathModule(TableConfig):
   )
   arguments: list[Union[Literal["[VALUES]"], float, int]] = Field(
     ...,
-    description="a list of arguments to pass to the ",
+    description="a list of arguments to pass to the",
     json_schema_extra={"what to use instead of values": "[VALUES]"},
     examples=[
       [-1, "[VALUES]"],
@@ -774,20 +774,69 @@ class _MathModule(TableConfig):
   )
 
 class _ScalarAnnotation(_ValueEncoding):
-  # TODO: ADD MORE DOCUMENTATION HERE
-  transformations: Optional[list[_MathModule]] = Field(default=None)
+  transformations: Optional[list[_MathModule]] = Field(
+    default=None,
+    description="a list of mathematical transformations to preform on values in a column"
+  )
 
 class _KeyValueAnnotation(_ScalarAnnotation):
-  annotation_name: str = Field(...)
+  annotation_name: str = Field(
+    ...,
+    description="the name (key) of an unspecified edge annotation you're encoding in a key value pair",
+    json_schema_extra={
+      "prohibited annotation names (keys)": [
+        "sample_size",
+        "p_value",
+        "multiple_testing_correction",
+        "relationship_strength",
+        "assertion_method",
+        "notes"
+      ]
+    },
+    examples=["uncorrected_p_value", "cluster_name", "accompanying_study"]
+  )
 
 class _Annotations(TableConfig):
-  sample_size: Optional[_ScalarAnnotation] = Field(default=None)
-  p_value: Optional[_ScalarAnnotation] = Field(default=None)
-  multiple_testing_correction: Optional[_ScalarAnnotation] = Field(default=None)
-  relationship_strength: Optional[_ScalarAnnotation] = Field(default=None)
-  assertion_method: Optional[_ScalarAnnotation] = Field(default=None)
-  notes: Optional[_ScalarAnnotation] = Field(default=None)
-  kv: Optional[list[_KeyValueAnnotation]] = Field(default=None)
+  sample_size: Optional[_ScalarAnnotation] = Field(
+    default=None,
+    description="the optional sample size used to make the statement"
+  )
+  p_value: Optional[_ScalarAnnotation] = Field(
+    default=None,
+    description="the optional (multiple testing corrected if possible) p value for the statement"
+  )
+  multiple_testing_correction: Optional[_ScalarAnnotation] = Field(
+    default=None,
+    description="the optional multiple testing correction method use for the p value for a statement",
+    json_schema_extra={
+      "example multiple testing corrections": ["Bonferroni", "Benjamnini-Hochberg"]
+    }
+  )
+  relationship_strength: Optional[_ScalarAnnotation] = Field(
+    default=None,
+    description="the optional strength of the relationship outlines in a statement",
+    json_schema_extra={
+      "example strengths": ["Regression Coeffiecents", "Log Fold Changes", "VIP Scores"]
+    }
+  )
+  assertion_method: Optional[_ScalarAnnotation] = Field(
+    default=None,
+    description="the optional statistical test or method used to make a statement",
+    json_schema_extra={
+      "example assertion methods": ["Pearson Correlations", "Linear Mixed Model", "Fisher's Exact Test"]
+    }
+  )
+  notes: Optional[_ScalarAnnotation] = Field(
+    default=None,
+    description="a freetext field to expose any relevant context not specified in the the other statement annotations",
+  )
+  kv: Optional[list[_KeyValueAnnotation]] = Field(
+    default=None,
+    description="a list of custom statement annotations in key-value style to capture useful information not in the predefined annotations",
+    json_schema_extra={
+      "example kv annotations": ["uncorrected_p_value", "cluster_name", "accompanying_study"]
+    }
+  )
 
 class _SectionStatuses(str, Enum):
   ALPHA = "ALPHA"
