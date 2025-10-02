@@ -32,7 +32,7 @@
         doCheck = false;
       };
       OCIContainer = pkgs.dockerTools.buildImage {
-        pname = AppName;
+        name = AppName;
         tag = version;
         contents = [TableConfigAPIS];
         config = {
