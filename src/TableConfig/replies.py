@@ -143,6 +143,11 @@ class _EncodingMethods(str, Enum):
 class _ValueEncoding(TableConfig):
   method: _EncodingMethods = Field(default=_EncodingMethods.VALUE)
   encoding: str = Field(...)
+  fill: Optional[_FillMethods] = Field(
+    default=None,
+    description="a polars fill_null strategy to fill empty rows in a specified column",
+    examples=["FORWARD", "BACKWARD", "MEAN"]
+  )
 
 class _FillMethods(str, Enum):
   FORWARD = "FORWARD"
@@ -362,11 +367,21 @@ class _NodeSpec(_ValueEncoding):
     description="a suffix to add to the end of all values before mapping",
     examples=[" sp.", "Syndrome", "Disease"]
   )
-  # TODO: START DOCUMENTATION HERE
-  fill: Optional[_FillMethods] = Field(default=None)
-  remove: Optional[list[str]] = Field(default=None)
-  regex: Optional[list[_RegexRules]] = Field(default=None)
-  explode_by: Optional[str] = Field(default=None)
+  remove: Optional[list[str]] = Field(
+    default=None,
+    description="a list of substrings to remove from values in a column",
+    json_schema_extra={"equivalent to": "re.sub(substring, "", values)"},
+    examples=["_", " ", "."]
+  )
+  regex: Optional[list[_RegexRules]] = Field(
+    default=None,
+    description="a list of regular expressions to apply to values in a column"
+  )
+  explode_by: Optional[str] = Field(
+    default=None,
+    description="a delimiter to split values in a column into a list of values before exploding those values with polars explode",
+    examples=[",", "|", " "]
+  )
 
 class _BiolinkPredicates(str, Enum):
   ACTIVE_IN = "ACTIVE_IN"
@@ -652,14 +667,35 @@ class _BiolinkQualifiers(str, Enum):
   TEMPORAL_INTERVAL_QUALIFIER = "TEMPORAL_INTERVAL_QUALIFIER"
 
 class _Qualifier(TableConfig):
-  qualifier: _BiolinkQualifiers = Field(...)
-  encoding: str = Field(...)
+  qualifier: _BiolinkQualifiers = Field(
+    ...,
+    description="a valid biolink qualfier",
+    examples=["TEMPORAL_INTERVAL_QUALIFIER", "ANATOMICAL_CONTEXT_QUALIFIER", "POPULATION_CONTEXT_QUALIFIER"]
+  )
+  encoding: str = Field(
+    ...,
+    description="the value to give context to the biolink qualifier",
+    examples=["24 Hours", "Alzheimers Disease", "Liver"]
+  )
 
 class _Statement(TableConfig):
-  subject: _NodeSpec = Field(...)
-  object: _NodeSpec = Field(...)
-  predicate: _BiolinkPredicates = Field(...)
-  qualifiers: _NodeSpec[list[_Qualifier]] = Field(default=None)
+  subject: _NodeSpec = Field(
+    ...,
+    description="the subject to qualify a statement - the thing doing something"
+  )
+  object: _NodeSpec = Field(
+    ...,
+    description="the object to qualify a statement - the thing getting something done to it"
+  )
+  predicate: _BiolinkPredicates = Field(
+    ...,
+    description="a valid biolink predicate to qualify a statement - the thing something does",
+    examples=["ASSOCIATED_WITH", "CORRELATED_WITH", "AFFECTS"]
+  )
+  qualifiers: _NodeSpec[list[_Qualifier]] = Field(
+    default=None,
+    description="optional list of biolink qualifiers"
+  )
 
 class _ContributionKinds(str, Enum):
   CURATION = "CURATION"
@@ -667,10 +703,33 @@ class _ContributionKinds(str, Enum):
   TOOL = "TOOL"
 
 class _Contributor(TableConfig):
-  kind: _ContributionKinds = Field(default=_ContributionKinds.CURATION)
-  name: str = Field(...)
-  organization: str = Field(...)
-  contributor_comment: Optional[str] = Field(default=None)
+  kind: _ContributionKinds = Field(
+    default=_ContributionKinds.CURATION,
+    description="the kind of contribution a contributor makes",
+    examples=["CURATION", "VALIDATION", "TOOL"]
+  )
+  name: str = Field(
+    ...,
+    description="the name of the contributor",
+    examples=["Skye", "Dr. Roach", "TableConfigMigrator2.0.0"]
+  )
+  organization: Optional[list[str]] = Field(
+    default=None,
+    description="optional list of organizations the contribtor is affilated with",
+    examples=[
+      ["Institute For Systems Biology", "CalPoly SLO"],
+      ["University of Washington"],
+      ["UNAM", "NCBI", "Pfizer"]
+    ]
+  )
+  contributor_comment: Optional[str] = Field(
+    default=None,
+    description="anything a contributor feels the need to disclose here",
+    examples=[
+      "the migration script is in alpha and there may still be plenty of errors",
+      "I recieved 100k in funding from the authors of this study"
+    ]
+  )
 
 class _Sources(str, Enum):
   PUBMED = "PUBMED"
@@ -678,19 +737,44 @@ class _Sources(str, Enum):
   DOI = "DOI"
 
 class _Provenance(TableConfig):
-  source: _Sources = Field(default="PMC")
-  publication: str = Field(...)
-  contributors: list[_Contributor] = Field(...)
+  source: _Sources = Field(
+    default="PMC",
+    description="one of the valid knowledge sources for tabular data",
+    examples=["PUBMED", "PMC", "DOI"]
+  )
+  publication: Union[str, int] = Field(
+    ...,
+    description="a valid curie for the publication containing the data source without its prefix",
+    json_schema_extra={"curie prefixes": ["doi:", "PMC:", "PMID:"]},
+    examples=["PMC10349864", 39579765, "PMC11176916"]
+  )
+  contributors: list[_Contributor] = Field(
+    ...,
+    description="a list of people and tools that contributed to the creation of this config"
+  )
 
 class _MathFunctions(str, Enum):
   COPYSIGN = "COPYSIGN"
   POW = "POW"
 
 class _MathModule(TableConfig):
-  function: _MathFunctions = Field(...)
-  arguments: list[Union[Literal["[VALUES]"], float, int]] = Field(...)
+  function: _MathFunctions = Field(
+    ...,
+    description="an approved python math module function to apply to values in a column",
+    examples=["COPYSIGN", "POW"]
+  )
+  arguments: list[Union[Literal["[VALUES]"], float, int]] = Field(
+    ...,
+    description="a list of arguments to pass to the ",
+    json_schema_extra={"what to use instead of values": "[VALUES]"},
+    examples=[
+      [-1, "[VALUES]"],
+      ["[VALUES]", 10]
+    ]
+  )
 
 class _ScalarAnnotation(_ValueEncoding):
+  # TODO: ADD MORE DOCUMENTATION HERE
   transformations: Optional[list[_MathModule]] = Field(default=None)
 
 class _KeyValueAnnotation(_ScalarAnnotation):
