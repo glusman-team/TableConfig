@@ -841,12 +841,21 @@ class _Annotations(TableConfig):
     }
   )
 
+class _Syntaxes(str, Enum):
+  TC2 = "TC2"
+  TC3 = "TC3"
+
 class _SectionStatuses(str, Enum):
   ALPHA = "ALPHA"
   BETA = "BETA"
   PRIMETIME = "PRIMETIME"
 
 class SingleSection(TableConfig):
+  syntax: _Syntaxes = Field(
+    default=_Syntaxes.TC3,
+    description="which table config syntax the section is written in",
+    examples=["TC2", "TC3"]
+  )
   status: _SectionStatuses = Field(
     default=_SectionStatuses.ALPHA,
     description="a status defining the confidence behind a section in a configuration",
