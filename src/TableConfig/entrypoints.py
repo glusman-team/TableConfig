@@ -13,7 +13,7 @@ from typing import Any
 
 app: FastAPI = FastAPI()
 
-@app.get("/heathz", response_model=Healthz)
+@app.get("/healthz", response_model=Healthz)
 def healthz() -> Healthz:
   return Healthz(ok=True)
 
