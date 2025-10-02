@@ -846,7 +846,7 @@ class _SectionStatuses(str, Enum):
   BETA = "BETA"
   PRIMETIME = "PRIMETIME"
 
-class _SingleSection(TableConfig):
+class SingleSection(TableConfig):
   status: _SectionStatuses = Field(
     default=_SectionStatuses.ALPHA,
     description="a status defining the confidence behind a section in a configuration",
@@ -869,7 +869,7 @@ class _SingleSection(TableConfig):
     description="annotations to give the statement needed context"
   )
 
-class _SectionAnnotated(_SingleSection):
+class _SectionAnnotated(SingleSection):
   origin: Path = Field(...)
   section_number: PositiveInt = Field(...)
 
