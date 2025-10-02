@@ -93,12 +93,12 @@
     in {
       packages.deployment = DeployAPIS;
       devShells.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
+        buildInputs = [
           config.packages.deployment
+          pkgs.minikube
+          pkgs.kubectl
+          pkgs.docker
           py.flake8
-          minikube
-          kubectl
-          docker
         ];
       };
     };
