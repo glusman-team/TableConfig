@@ -31,7 +31,7 @@
         ];
         doCheck = false;
       };
-      OCIContainer = pkgs.ociTools.buildImage {
+      OCIContainer = pkgs.dockerTools.buildImage {
         pname = AppName;
         tag = version;
         contents = [TableConfigAPIS];
