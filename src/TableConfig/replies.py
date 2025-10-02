@@ -765,11 +765,14 @@ class _MathModule(TableConfig):
   )
   arguments: list[Union[Literal["[VALUES]"], float, int]] = Field(
     ...,
-    description="a list of arguments to pass to the",
-    json_schema_extra={"what to use instead of values": "[VALUES]"},
+    description="a list of arguments to pass to the function - [VALUES] MUST always be present in the list",
+    json_schema_extra={
+      "what to use instead of values": "[VALUES]",
+      "required arguments": ["[VALUES]"]
+    },
     examples=[
       [-1, "[VALUES]"],
-      ["[VALUES]", 10]
+      ["[VALUES]", 10.0]
     ]
   )
 
