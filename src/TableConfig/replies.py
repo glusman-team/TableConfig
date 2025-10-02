@@ -844,11 +844,27 @@ class _SectionStatuses(str, Enum):
   PRIMETIME = "PRIMETIME"
 
 class _SingleSection(TableConfig):
-  status: _SectionStatuses = Field(default=_SectionStatuses.ALPHA)
-  source: Union[_ExcelSource, _TextSource] = Field(...)
-  statement: _Statement = Field(...)
-  provenance: _Provenance = Field(...)
-  annotations: _Annotations = Field(...)
+  status: _SectionStatuses = Field(
+    default=_SectionStatuses.ALPHA,
+    description="a status defining the confidence behind a section in a configuration",
+    examples=["ALPHA", "BETA", "PRIMETIME"]
+  )
+  source: Union[_ExcelSource, _TextSource] = Field(
+    ...,
+    description="the data source to extract statements from"
+  )
+  statement: _Statement = Field(
+    ...,
+    description="a defined statement to extract from the data source"
+  )
+  provenance: _Provenance = Field(
+    ...,
+    description="provenance for the data source, statement, and configuration"
+  )
+  annotations: _Annotations = Field(
+    ...,
+    description="annotations to give the statement needed context"
+  )
 
 class _SectionAnnotated(_SingleSection):
   origin: Path = Field(...)
