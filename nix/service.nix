@@ -88,6 +88,7 @@
           podman
         ];
         text = ''
+          minikube config set rootless true
           minikube start
           minikube image load ${DockerContainer}
           kubectl apply -f ${K8Manifests}
