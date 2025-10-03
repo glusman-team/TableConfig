@@ -88,11 +88,11 @@
                 containers:
                   - name: ${AppName}-container
                     image: ${DockerContainer.name}:${version}
-                ports:
-                  - containerPort: ${port}
-            ---
-            apiVersion: v1
-            kind: Service
+                    ports:
+                      - containerPort: ${port}
+          ---
+          apiVersion: v1
+          kind: Service
           metadata:
             name: ${AppName}-service
           spec:
@@ -138,8 +138,16 @@
           export NSS_WRAPPER_PASSWD="$PASSWD_FILE"
           export NSS_WRAPPER_GROUP="$GROUP_FILE"
 
+          systemctl --user enable --now podman.socket || true
+          sleep 1
+
+          if ! minikube status >/dev/null 2>&1; then
+            minikube delete --all --purge || true
+          fi
+
           minikube config set rootless true
-          minikube start --driver=podman
+          minikube config set driver podman
+          minikube start --container-runtime=containerd
 
           minikube image load ${DockerContainer} --transfer=registry
           kubectl apply -f ${K8Manifests}
