@@ -108,11 +108,14 @@
       DeployAPIS = pkgs.writeShellApplication {
         name = "deploy-${AppName}-to-kubernetes";
         runtimeInputs = with pkgs; [ 
+          fuse-overlayfs
+          slirp4netns
           nss_wrapper
           coreutils
           minikube
           kubectl
           podman
+          uidmap
         ];
         text = ''
           set -euo pipefail
@@ -137,9 +140,6 @@
           export LD_PRELOAD="${pkgs.nss_wrapper}/lib/libnss_wrapper.so"
           export NSS_WRAPPER_PASSWD="$PASSWD_FILE"
           export NSS_WRAPPER_GROUP="$GROUP_FILE"
-
-          systemctl --user enable --now podman.socket || true
-          sleep 1
 
           if ! minikube status >/dev/null 2>&1; then
             minikube delete --all --purge || true
