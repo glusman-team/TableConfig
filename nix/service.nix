@@ -34,7 +34,7 @@
       DockerContainer = pkgs.dockerTools.buildImage {
         name = AppName;
         tag = version;
-        copyToRoot = {
+        copyToRoot = pkgs.buildEnv {
           name = AppName;
           paths = [TableConfigAPIS];
         };
