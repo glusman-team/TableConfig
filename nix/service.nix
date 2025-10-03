@@ -82,12 +82,13 @@
         runtimeInputs = with pkgs; [
           minikube
           kubectl
-          docker
+          podman
         ];
         text = ''
+          minikube start
           minikube image load ${DockerContainer}
           kubectl apply -f ${K8Manifests}
-          kubectl get all -l pp=${AppName}
+          echo "kubectl get all -l pp=${AppName}"
         '';
       };
     in {
@@ -97,7 +98,7 @@
           config.packages.deployment
           pkgs.minikube
           pkgs.kubectl
-          pkgs.docker
+          pkgs.podman
           py.flake8
         ];
       };
