@@ -131,7 +131,7 @@
           PASSWD_FILE="$NSS_DIR/passwd"
           GROUP_FILE="$NSS_DIR/group"
 
-          echo "$USER_NAME:x:$UID_NUM:$GID_NUM:$USER_NAME:$HOME:$SHELL > "$PASSWD_FILE"
+          echo "$USER_NAME:x:$UID_NUM:$GID_NUM:$USER_NAME:$HOME:$SHELL" > "$PASSWD_FILE"
           echo "$GROUP_NAME:x:$GID_NUM:" > "$GROUP_FILE"
 
           export LD_PRELOAD="${pkgs.nss_wrapper}/lib/libnss_wrapper.so"
