@@ -139,6 +139,7 @@
       devShells.default = pkgs.mkShell {
         buildInputs = [
           config.packages.deployment
+          pkgs.coreutils
           pkgs.minikube
           pkgs.kubectl
           pkgs.podman
