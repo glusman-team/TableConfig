@@ -119,8 +119,8 @@
 
           UID_NUM="$(id -u)"
           GID_NUM="$(id -g)"
-          USER_NAME="$(id -un)"
-          GROUP_NAME="$(id -gn)"
+          USER_NAME="''${USER:-user$UID_NUM}"
+          GROUP_NAME="''${GROUP:-gid$GID_NUM}"
 
           export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
           mkdir -p "$XDG_RUNTIME_DIR"
