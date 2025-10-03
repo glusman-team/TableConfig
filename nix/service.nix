@@ -31,7 +31,7 @@
         ];
         doCheck = false;
       };
-      OCIContainer = pkgs.dockerTools.buildImage {
+      DockerContainer = pkgs.dockerTools.buildImage {
         name = AppName;
         tag = version;
         contents = [TableConfigAPIS];
@@ -59,7 +59,7 @@
               spec:
                 containers:
                   - name: ${AppName}-container
-                    image: ${OCIContainer.name}:${version}
+                    image: ${DockerContainer.name}:${version}
                 ports:
                   - containerPort: ${port}
             ---
@@ -85,7 +85,7 @@
           docker
         ];
         text = ''
-          minikube image load ${OCIContainer}
+          minikube image load ${DockerContainer}
           kubectl apply -f ${K8Manifests}
           kubectl get all -l pp=${AppName}
         '';
