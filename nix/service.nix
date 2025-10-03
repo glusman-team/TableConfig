@@ -89,7 +89,7 @@
         ];
         text = ''
           minikube config set rootless true
-          minikube start
+          minikube start --driver=podman
           minikube image load ${DockerContainer}
           kubectl apply -f ${K8Manifests}
           echo "kubectl get all -l pp=${AppName}"
