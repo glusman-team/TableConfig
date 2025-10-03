@@ -107,8 +107,7 @@
       };
       DeployAPIS = pkgs.pkgs.writeShellApplication {
         name = "deploy-${AppName}-to-kubernetes";
-        runtimeInputs = with pkgs; [
-          containers-common 
+        runtimeInputs = with pkgs; [ 
           minikube
           kubectl
           podman
@@ -133,7 +132,6 @@
       devShells.default = pkgs.mkShell {
         buildInputs = [
           config.packages.deployment
-          pkgs.containers-common
           pkgs.minikube
           pkgs.kubectl
           pkgs.podman
