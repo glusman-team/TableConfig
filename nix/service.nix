@@ -108,38 +108,17 @@
       DeployAPIS = pkgs.writeShellApplication {
         name = "deploy-${AppName}-to-kubernetes";
         runtimeInputs = with pkgs; [ 
-          fuse-overlayfs
-          slirp4netns
-          nss_wrapper
           coreutils
           minikube
           kubectl
           podman
-          su
         ];
         text = ''
           set -euo pipefail
 
           UID_NUM="$(id -u)"
-          GID_NUM="$(id -g)"
-          USER_NAME="''${USER:-user$UID_NUM}"
-          GROUP_NAME="''${GROUP:-gid$GID_NUM}"
-
           export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
           mkdir -p "$XDG_RUNTIME_DIR"
-
-          NSS_DIR="$XDG_RUNTIME_DIR/nss"
-          mkdir -p "$NSS_DIR"
-
-          PASSWD_FILE="$NSS_DIR/passwd"
-          GROUP_FILE="$NSS_DIR/group"
-
-          echo "$USER_NAME:x:$UID_NUM:$GID_NUM:$USER_NAME:$HOME:$SHELL" > "$PASSWD_FILE"
-          echo "$GROUP_NAME:x:$GID_NUM:" > "$GROUP_FILE"
-
-          export LD_PRELOAD="${pkgs.nss_wrapper}/lib/libnss_wrapper.so"
-          export NSS_WRAPPER_PASSWD="$PASSWD_FILE"
-          export NSS_WRAPPER_GROUP="$GROUP_FILE"
 
           if ! minikube status >/dev/null 2>&1; then
             minikube delete --all --purge || true
@@ -160,13 +139,10 @@
       devShells.default = pkgs.mkShell {
         buildInputs = [
           config.packages.deployment
-          pkgs.fuse-overlayfs
-          pkgs.slirp4netns
           pkgs.minikube
           pkgs.kubectl
           pkgs.podman
           py.flake8
-          pkgs.su
         ];
         shellHook = ''
           set -euo pipefail
