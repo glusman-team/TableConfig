@@ -144,8 +144,8 @@
           export XDG_CONFIG_HOME="$HOME/.config"
           mkdir -p "$XDG_CONFIG_HOME/containers"
 
-          install -m 0644 ${PolicyJSON}
-          install -m 0644 ${RegistriesConf}
+          install -m 0644 ${PolicyJSON} "$XDG_CONFIG_HOME/containers/policy.json"
+          install -m 0644 ${RegistriesConf} "$XDG_CONFIG_HOME/containers/registries.conf"
 
           UID_NUM="$(id -u)"
           export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
