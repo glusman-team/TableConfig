@@ -105,7 +105,7 @@
                 targetPort: ${port}
         '';
       };
-      DeployAPIS = pkgs.pkgs.writeShellApplication {
+      DeployAPIS = pkgs.writeShellApplication {
         name = "deploy-${AppName}-to-kubernetes";
         runtimeInputs = with pkgs; [ 
           minikube
