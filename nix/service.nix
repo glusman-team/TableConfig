@@ -115,7 +115,8 @@
         text = ''
           set -euo pipefail
 
-          export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+          UID_NUM="$(id -u)"
+          export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
           mkdir -p "$XDG_RUNTIME_DIR"
 
           minikube config set rootless true
@@ -138,13 +139,16 @@
           py.flake8
         ];
         shellHook = ''
+          set -euo pipefail
+
           export XDG_CONFIG_HOME="$HOME/.config"
           mkdir -p "$XDG_CONFIG_HOME/containers"
 
           install -m 0644 ${PolicyJSON}
           install -m 0644 ${RegistriesConf}
 
-          export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+          UID_NUM="$(id -u)"
+          export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
           mkdir -p "$XDG_RUNTIME_DIR"
 
           echo "DEVSHELL CONFIGURED!"
