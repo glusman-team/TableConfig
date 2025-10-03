@@ -108,6 +108,8 @@
       DeployAPIS = pkgs.writeShellApplication {
         name = "deploy-${AppName}-to-kubernetes";
         runtimeInputs = with pkgs; [ 
+          nss_wrapper
+          coreutils
           minikube
           kubectl
           podman
@@ -116,8 +118,25 @@
           set -euo pipefail
 
           UID_NUM="$(id -u)"
+          GID_NUM="$(id -g)"
+          USER_NAME="$(id -un)"
+          GROUP_NAME="$(id -gn)"
+
           export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
           mkdir -p "$XDG_RUNTIME_DIR"
+
+          NSS_DIR="$XDG_RUNTIME_DIR/nss"
+          mkdir -p "$NSS_DIR"
+
+          PASSWD_FILE="$NSS_DIR/passwd"
+          GROUP_FILE="$NSS_DIR/group"
+
+          echo "$USER_NAME:x:$UID_NUM:$GID_NUM:$USER_NAME:$HOME:$SHELL > "$PASSWD_FILE"
+          echo "$GROUP_NAME:x:$GID_NUM:" > "$GROUP_FILE"
+
+          export LD_PRELOAD="${pkgs.nss_wrapper}/lib/libnss_wrapper.so"
+          export NSS_WRAPPER_PASSWD="$PASSWD_FILE"
+          export NSS_WRAPPER_GROUP="$GROUP_FILE"
 
           minikube config set rootless true
           minikube start --driver=podman
