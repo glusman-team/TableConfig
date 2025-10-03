@@ -43,6 +43,31 @@
           Entrypoint = ["SERVE_TABLE_CONFIG_APIS"];
         };
       };
+      PolicyJSON = pkgs.writeText "policy.json" ''
+        {
+          "default": [
+            {"type": "insecureAcceptAnything"}
+          ]
+        }
+      '';
+      RegistriesConf = pkgs.writeText "registries.conf" ''
+        unqualified-search-registries = ["docker.io"]
+
+        [[registry]]
+        prefix = "docker.io"
+        location = "registry-1.docker.io"
+        blocked = false
+
+        [[registry]]
+        prefix = "quay.io"
+        location = "quay.io"
+        blocked = false
+
+        [[registry]]
+        prefix = "gcr.io"
+        location = "gcr.io"
+        blocked = false
+      '';
       K8Manifests = pkgs.writeTextFile {
         name = "${AppName}-manifest.yaml";
         text = ''
@@ -83,15 +108,23 @@
       DeployAPIS = pkgs.pkgs.writeShellApplication {
         name = "deploy-${AppName}-to-kubernetes";
         runtimeInputs = with pkgs; [
+          containers-common 
           minikube
           kubectl
           podman
         ];
         text = ''
+          set -euo pipefail
+
+          export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+          mkdir -p "$XDG_RUNTIME_DIR"
+
           minikube config set rootless true
           minikube start --driver=podman
-          minikube image load ${DockerContainer}
+
+          minikube image load ${DockerContainer} --transfer=registry
           kubectl apply -f ${K8Manifests}
+
           echo "kubectl get all -l pp=${AppName}"
         '';
       };
@@ -100,11 +133,24 @@
       devShells.default = pkgs.mkShell {
         buildInputs = [
           config.packages.deployment
+          pkgs.containers-common
           pkgs.minikube
           pkgs.kubectl
           pkgs.podman
           py.flake8
         ];
+        shellHook = ''
+          export XDG_CONFIG_HOME="$HOME/.config"
+          mkdir -p "$XDG_CONFIG_HOME/containers"
+
+          install -m 0644 ${PolicyJSON}
+          install -m 0644 ${RegistriesConf}
+
+          export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+          mkdir -p "$XDG_RUNTIME_DIR"
+
+          echo "DEVSHELL CONFIGURED!"
+        '';
       };
     };
 }
