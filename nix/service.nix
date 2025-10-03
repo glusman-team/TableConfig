@@ -34,7 +34,10 @@
       DockerContainer = pkgs.dockerTools.buildImage {
         name = AppName;
         tag = version;
-        contents = [TableConfigAPIS];
+        copyToRoot = {
+          name = AppName;
+          paths = [TableConfigAPIS];
+        };
         config = {
           ExposedPorts = {"${port}/tcp" = {};};
           Entrypoint = ["SERVE_TABLE_CONFIG_APIS"];
