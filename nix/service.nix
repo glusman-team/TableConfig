@@ -115,6 +115,7 @@
           minikube
           kubectl
           podman
+          su
         ];
         text = ''
           set -euo pipefail
@@ -159,10 +160,13 @@
       devShells.default = pkgs.mkShell {
         buildInputs = [
           config.packages.deployment
+          pkgs.fuse-overlayfs
+          pkgs.slirp4netns
           pkgs.minikube
           pkgs.kubectl
           pkgs.podman
           py.flake8
+          pkgs.su
         ];
         shellHook = ''
           set -euo pipefail
