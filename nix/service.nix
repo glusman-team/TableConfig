@@ -115,7 +115,6 @@
           minikube
           kubectl
           podman
-          uidmap
         ];
         text = ''
           set -euo pipefail
