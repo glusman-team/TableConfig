@@ -3,12 +3,12 @@
   perSystem = {system, config, ...}:
     let
       pkgs = import inputs.nixpkgs {inherit system;};
-      AppName = "table-config-apis";
+      AppName = "table-config-APIs";
       host = "0.0.0.0";
       port = "8700";
       version = "3.0.0";
       py = pkgs.python313Packages;
-      TableConfigAPIS = py.buildPythonApplication {
+      TableConfigAPIs = py.buildPythonApplication {
         pname = "TableConfig";
         version = version;
         src = ../.;
@@ -36,7 +36,7 @@
         tag = version;
         copyToRoot = pkgs.buildEnv {
           name = AppName;
-          paths = [TableConfigAPIS];
+          paths = [TableConfigAPIs];
         };
         config = {
           ExposedPorts = {"${port}/tcp" = {};};
@@ -105,7 +105,7 @@
                 targetPort: ${port}
         '';
       };
-      DeployAPIS = pkgs.writeShellApplication {
+      DeployAPIs = pkgs.writeShellApplication {
         name = "deploy-${AppName}-to-kubernetes";
         runtimeInputs = with pkgs; [ 
           coreutils
@@ -135,9 +135,11 @@
         '';
       };
     in {
-      packages.deployment = DeployAPIS;
+      packages.deployment = DeployAPIs;
+      packages.table-config = TableConfigAPIs;
       devShells.default = pkgs.mkShell {
         buildInputs = [
+          config.packages.table-config
           config.packages.deployment
           pkgs.coreutils
           pkgs.minikube
