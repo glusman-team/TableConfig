@@ -3,7 +3,7 @@
   perSystem = {system, config, ...}:
     let
       pkgs = import inputs.nixpkgs {inherit system;};
-      AppName = "table-config-APIs";
+      AppName = "table-config-apis";
       host = "0.0.0.0";
       port = "8700";
       version = "3.0.0";
