@@ -1,4 +1,4 @@
-# TableConfig
+# TableConfig (Version 3.0.0)
 
 The TableConfig microservice for the new distributed, cloud-native Tablassert knowledge extractor. TableConfigs declare instructions that Tablassert uses to extract knowledge assertions from tabular data.
 
