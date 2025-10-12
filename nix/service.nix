@@ -126,7 +126,6 @@
 
           minikube config set rootless true
           minikube config set driver podman
-          podman system migrate
           minikube start --container-runtime=containerd
 
           minikube image load ${DockerContainer} --transfer=registry
