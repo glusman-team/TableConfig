@@ -127,7 +127,7 @@
       '';
     in {
       packages.table-config = TableConfigAPIs;
-      devShells.default = pkgs.buildFHSUserEnv {
+      devShells.default = pkgs.buildFHSEnv {
         name = "minikube-deployment-environment";
         multiPkgs = pkgs: (with pkgs; [
           config.packages.table-config
