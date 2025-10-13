@@ -108,6 +108,8 @@
       DeployAPIs = pkgs.writeShellScriptBin "deploy-${AppName}-to-kubernetes" ''
         set -euo pipefail
 
+        getent passwd $(id -u)
+
         if ! minikube status >/dev/null 2>&1; then
           minikube delete --all --purge || true
           minikube config set rootless true
@@ -125,28 +127,33 @@
       '';
     in {
       packages.table-config = TableConfigAPIs;
-      devShells.default = pkgs.mkShell {
-        buildInputs = [
+      devShells.default = pkgs.buildFHSUserEnv {
+        name = "minikube-deployment-environment";
+        multiPkgs = pkgs: (with pkgs; [
           config.packages.table-config
-          pkgs.coreutils
-          pkgs.minikube
-          pkgs.kubectl
-          pkgs.podman
           DeployAPIs
           py.flake8
-        ];
-        shellHook = ''
-          set -euo pipefail
+          coreutils
+          minikube
+          kubectl
+          podman
+        ]);
+        runScript = ''
+          ${pkgs.bash}/bin/bash --rcfile <(echo "
 
-          export XDG_CONFIG_HOME="$HOME/.config"
-          mkdir -p "$XDG_CONFIG_HOME/containers"
+            set -euo pipefail
 
-          install -m 0644 ${PolicyJSON} "$XDG_CONFIG_HOME/containers/policy.json"
-          install -m 0644 ${RegistriesConf} "$XDG_CONFIG_HOME/containers/registries.conf"
+            export XDG_CONFIG_HOME='$HOME/.config'
+            mkdir -p '$XDG_CONFIG_HOME/containers'
 
-          UID_NUM="$(id -u)"
-          export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
-          mkdir -p "$XDG_RUNTIME_DIR"
+            install -m 0644 ${PolicyJSON} '$XDG_CONFIG_HOME/containers/policy.json'
+            install -m 0644 ${RegistriesConf} '$XDG_CONFIG_HOME/containers/registries.conf'
+
+            UID_NUM='$(id -u)'
+            export XDG_RUNTIME_DIR='/run/user/$UID_NUM'
+            mkdir -p '$XDG_RUNTIME_DIR'
+
+          "
         '';
       };
     };
