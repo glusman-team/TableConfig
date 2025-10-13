@@ -124,16 +124,15 @@
         echo "kubectl get all -l pp=${AppName}"
       '';
     in {
-      packages.deployment = DeployAPIs;
       packages.table-config = TableConfigAPIs;
       devShells.default = pkgs.mkShell {
         buildInputs = [
           config.packages.table-config
-          config.packages.deployment
           pkgs.coreutils
           pkgs.minikube
           pkgs.kubectl
           pkgs.podman
+          DeployAPIs
           py.flake8
         ];
         shellHook = ''
