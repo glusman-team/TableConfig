@@ -153,7 +153,7 @@
             export XDG_RUNTIME_DIR='/run/user/$UID_NUM'
             mkdir -p '$XDG_RUNTIME_DIR'
 
-          )"
+          ")
         '';
       };
     };
