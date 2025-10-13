@@ -126,6 +126,8 @@
 
           minikube config set rootless true
           minikube config set driver podman
+          minikube config set memory 8192
+          minikube config set cpus 4
           podman system migrate
           minikube start --container-runtime=containerd
 
