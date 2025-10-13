@@ -105,38 +105,24 @@
                 targetPort: ${port}
         '';
       };
-      DeployAPIs = pkgs.writeShellApplication {
-        name = "deploy-${AppName}-to-kubernetes";
-        runtimeInputs = with pkgs; [ 
-          coreutils
-          minikube
-          kubectl
-          podman
-        ];
-        text = ''
-          set -euo pipefail
+      DeployAPIs = pkgs.writeShellScriptBin "deploy-${AppName}-to-kubernetes" ''
+        set -euo pipefail
 
-          UID_NUM="$(id -u)"
-          export XDG_RUNTIME_DIR="/run/user/$UID_NUM"
-          mkdir -p "$XDG_RUNTIME_DIR"
-
-          if ! minikube status >/dev/null 2>&1; then
-            minikube delete --all --purge || true
-          fi
-
+        if ! minikube status >/dev/null 2>&1; then
+          minikube delete --all --purge || true
           minikube config set rootless true
           minikube config set driver podman
           minikube config set memory 8192
           minikube config set cpus 4
-          podman system migrate
+          podman system migrate || true
           minikube start --container-runtime=containerd
+        fi
 
-          minikube image load ${DockerContainer} --transfer=registry
-          kubectl apply -f ${K8Manifests}
+        minikube image load ${DockerContainer} --transfer=registry
+        kubectl apply -f ${K8Manifests}
 
-          echo "kubectl get all -l pp=${AppName}"
-        '';
-      };
+        echo "kubectl get all -l pp=${AppName}"
+      '';
     in {
       packages.deployment = DeployAPIs;
       packages.table-config = TableConfigAPIs;
